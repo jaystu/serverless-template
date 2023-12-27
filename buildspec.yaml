@@ -1,14 +1,6 @@
 version: 0.2
-
 phases:
-  install:
-    runtime-versions:
-       python: 3.9
   build:
     commands:
-      - pip install aws-sam-cli
-      - sam build -t serverless-template/template.yaml
-      - sam package --template-file serverless-template/template.yaml --output-template-file outputtemplate.yaml --s3-bucket wordblitz-build
-artifacts:
-  files: 
-    - outputtemplate.yaml
+      - sam build
+      - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
