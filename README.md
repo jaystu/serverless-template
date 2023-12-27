@@ -1,1 +1,1 @@
-# serverless-template
+# wordblitz
