@@ -7,8 +7,8 @@ phases:
   build:
     commands:
       - pip install aws-sam-cli
-      - sam build -t sam-app/template.yaml
-      - sam package --template-file sam-app/template.yaml --output-template-file outputtemplate.yaml --s3-bucket wordblitz-build
+      - sam build -t serverless-template/template.yaml
+      - sam package --template-file serverless-template/template.yaml --output-template-file outputtemplate.yaml --s3-bucket wordblitz-build
 artifacts:
   files: 
     - outputtemplate.yaml
