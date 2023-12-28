@@ -31,7 +31,7 @@ coverage:
 test:
 	source ./venv/bin/activate &&  pytest -v --disable-socket -s tests/unit/
 	
-integration_test:
+integrationTest:
 	source ./venv/bin/activate && AWS_SAM_STACK_NAME=staging-pet pytest -v --disable-socket -s tests/integration/
 
 build: ##=> Same as package except that we don't create a ZIP
