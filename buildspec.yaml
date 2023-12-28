@@ -3,4 +3,4 @@ phases:
   build:
     commands:
       - sam build
-      - sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
+      - sam deploy --stack-name staging-pet --parameter-overrides Stage=staging --no-confirm-changeset --no-fail-on-empty-changeset
