@@ -32,7 +32,7 @@ test:
 	source ./venv/bin/activate &&  pytest -v --disable-socket -s tests/unit/
 	
 integrationTest:
-	source ./venv/bin/activate && AWS_SAM_STACK_NAME=staging-pet pytest -v --disable-socket -s tests/integration/
+	source ./venv/bin/activate && AWS_SAM_STACK_NAME=staging-pet pytest -s tests/integration/ -v
 
 build: ##=> Same as package except that we don't create a ZIP
 	source ./venv/bin/activate && sam build
