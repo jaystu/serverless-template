@@ -18,6 +18,8 @@ print("PYTHONPATH")
 print(sys.path)
 print("WALK")
 print(next(os.walk('.'))[1])
+print("PREFIX")
+print(sys.prefix)
 from lambda_function.app import LambdaDynamoDBClass
 from lambda_function.app import lambda_handler, lambda_handler_helper
 
