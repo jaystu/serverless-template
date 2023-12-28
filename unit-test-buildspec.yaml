@@ -3,4 +3,4 @@ phases:
   build:
     commands:
       - make install
-      - make integrationTest
+      - make test
