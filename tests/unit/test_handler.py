@@ -9,7 +9,7 @@ import moto
 from aws_lambda_powertools.utilities.validation import validate
 
 # Import the Globals, Classes, Schemas, and Functions from the Lambda Handler
-sys.path.append('./lambda_function')
+sys.path.append('/serverless-template/lambda_function')
 from lambda_function.app import LambdaDynamoDBClass   # pylint: disable=wrong-import-position
 from lambda_function.app import lambda_handler, lambda_handler_helper  # pylint: disable=wrong-import-position
 

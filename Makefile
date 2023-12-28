@@ -16,6 +16,7 @@ all: clean build
 install: checkOSDependencies
 	${PIP} install virtualenv
 	python3 -m venv venv
+	source ./venv/bin/activate && ${PIP} install -r lambda_function/requirements.txt
 	source ./venv/bin/activate && ${PIP} install -r tests/requirements.txt
 
 shell:
