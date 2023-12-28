@@ -11,6 +11,10 @@ from aws_lambda_powertools.utilities.validation import validate
 # Import the Globals, Classes, Schemas, and Functions from the Lambda Handler
 print("PYTHONPATH")
 print(sys.path)
+lambda_function_dir = os.path.abspath('/serverless-template/lambda_function')
+sys.path.append(lambda_function_dir)
+print("PYTHONPATH")
+print(sys.path)
 from lambda_function.app import LambdaDynamoDBClass
 from lambda_function.app import lambda_handler, lambda_handler_helper
 
