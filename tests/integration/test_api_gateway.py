@@ -30,7 +30,6 @@ class TestApiGateway:
             ) from e
 
         stacks = response["Stacks"]
-        print(stacks)
         stack_outputs = stacks[0]["Outputs"]
         api_outputs = [output for output in stack_outputs if output["OutputKey"] == "PetApi"]
 
