@@ -2,7 +2,5 @@ version: 0.2
 phases:
   build:
     commands:
-      - make install
-      - make test
       - sam build
       - sam deploy --stack-name staging-pet --parameter-overrides Stage=staging --no-confirm-changeset --no-fail-on-empty-changeset
