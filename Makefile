@@ -7,6 +7,9 @@ target:
 clean: ##=> Deletes current build environment and latest build
 	$(info [*] Who needs all that anyway? Destroying environment....)
 	rm -rf ./.aws-sam/ ./venv/
+	find . -name '__pycache__' -exec rm -rf {} +
+	find . -name '.pytest_cache' -exec rm -rf {} +
+	find . -name '*.pyc' -exec rm -f {} +
 
 checkOSDependencies:
 	python3 --version || grep "3.9" || (echo "Error: Requires Python 3.9" && exit 1)
