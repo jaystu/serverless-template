@@ -55,11 +55,11 @@ def lambda_handler_helper(event: APIGatewayProxyEvent, dynamo_db: LambdaDynamoDB
         if path_parameters and 'id' in path_parameters:
             item_id = path_parameters['id']
             item_data = json.loads(event['body'])
-            # if item_id != item_data['id']:
-            #     return {
-            #         'statusCode': 400,
-            #         'body': 'Id in path does not match id in body'
-            #     }
+            if item_id != item_data['id']:
+                return {
+                    'statusCode': 400,
+                    'body': 'Id in path does not match id in body'
+                }
             return update_item(dynamo_db, item_id, item_data)
         else:
             return {
