@@ -2,5 +2,6 @@ version: 0.2
 phases:
   build:
     commands:
+      - make install
       - sam build
       - sam deploy --stack-name prod-pet --parameter-overrides Stage=prod --no-confirm-changeset --no-fail-on-empty-changeset
