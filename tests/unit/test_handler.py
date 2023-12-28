@@ -9,18 +9,7 @@ import moto
 from aws_lambda_powertools.utilities.validation import validate
 
 # Import the Globals, Classes, Schemas, and Functions from the Lambda Handler
-print("PYTHONPATH")
-print(sys.path)
-
-sys.path.append('...')
-sys.path.append('..')
-sys.path.append('.')
-print("PYTHONPATH")
-print(sys.path)
-print("WALK")
-print(next(os.walk('.'))[1])
-print("PREFIX")
-print(sys.prefix)
+sys.path.append('...') # required for CodepiPeline
 from lambda_function.app import LambdaDynamoDBClass
 from lambda_function.app import lambda_handler, lambda_handler_helper
 
