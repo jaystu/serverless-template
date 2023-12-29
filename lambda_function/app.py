@@ -10,6 +10,8 @@ from aws_lambda_powertools.utilities.typing import LambdaContext
 # Initialize the resources once per Lambda execution environment by using global scope.
 _LAMBDA_DYNAMODB_RESOURCE = { "resource" : resource('dynamodb'), 
                               "table_name" : environ.get("DYNAMODB_TABLE_NAME","NONE") }
+                              
+_DDB_PK = 'id'
 
 # Define a Global class an AWS Resource: Amazon DynamoDB. 
 class LambdaDynamoDBClass:
@@ -41,8 +43,8 @@ def lambda_handler_helper(event: APIGatewayProxyEvent, dynamo_db: LambdaDynamoDB
     path_parameters = event['pathParameters']
 
     if http_method == 'GET':
-        if path_parameters and 'id' in path_parameters:
-            return get_item(dynamo_db, path_parameters['id'])
+        if path_parameters and _DDB_PK in path_parameters:
+            return get_item(dynamo_db, path_parameters[_DDB_PK])
         else:
             return {
                 'statusCode': 400,
@@ -52,7 +54,7 @@ def lambda_handler_helper(event: APIGatewayProxyEvent, dynamo_db: LambdaDynamoDB
         item_data = json.loads(event['body'])
         return create_item(dynamo_db, item_data)
     elif http_method == 'PUT':
-        if path_parameters and 'id' in path_parameters:
+        if path_parameters and _DDB_PK in path_parameters:
             item_id = path_parameters['id']
             item_data = json.loads(event['body'])
             if item_id != item_data['id']:
