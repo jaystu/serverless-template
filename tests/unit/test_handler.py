@@ -141,6 +141,7 @@ class TestPetLambdaFunction(TestCase):
         
         response = lambda_handler_helper(event=test_event, dynamo_db=self.mocked_dynamodb_class)
         self.assertEqual(response["statusCode"] , 400)
+        self.assertEqual('Item already exists.', response['body'])
         
     def test_delete_happy(self):
         pk_value = str(uuid4())
@@ -203,6 +204,7 @@ class TestPetLambdaFunction(TestCase):
         response = lambda_handler_helper(event=test_event, dynamo_db=self.mocked_dynamodb_class)
         
         self.assertEqual(response["statusCode"] , 400)
+        self.assertEqual('Id in path does not match id in body', response['body'])
         
     def test_update_notExist(self):
         pk_value = str(uuid4())
