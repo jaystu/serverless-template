@@ -91,7 +91,7 @@ def create_item(dynamo_db: LambdaDynamoDBClass, item_data):
         item_data['modified'] = now
         
         # Define a condition expression to check if the item does not already exist
-        condition_expression = "attribute_not_exists(id)"
+        condition_expression = "attribute_not_exists("+_DDB_PK+")"
 
         # Put the item in the DynamoDB table
         response = dynamo_db.table.put_item(
@@ -142,7 +142,7 @@ def update_item(dynamo_db: LambdaDynamoDBClass, item_id, item_data):
         item_data['modified'] = datetime.datetime.utcnow().isoformat()
     
         # Define the condition expression to check if the item already exists
-        condition_expression = "attribute_exists(id)"
+        condition_expression = "attribute_exists("+_DDB_PK+")"
         
         # Define the UpdateExpression to set new values
         update_expression = "SET modified = :modified"
