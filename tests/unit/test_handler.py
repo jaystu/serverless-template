@@ -13,6 +13,8 @@ sys.path.append('.') # required for CodePipeline
 from lambda_function.app import LambdaDynamoDBClass
 from lambda_function.app import lambda_handler, lambda_handler_helper
 
+_DDB_PK = 'id'
+
 # Mock all AWS Services in use
 @moto.mock_dynamodb
 
@@ -35,7 +37,7 @@ class TestPetLambdaFunction(TestCase):
         dynamodb.create_table(
             TableName = self.test_ddb_table_name,
             KeySchema=[{"AttributeName": "id", "KeyType": "HASH"}],
-            AttributeDefinitions=[{"AttributeName": "id", "AttributeType": "S"}],
+            AttributeDefinitions=[{"AttributeName": _DDB_PK, "AttributeType": "S"}],
             BillingMode='PAY_PER_REQUEST'
             )
 
@@ -86,20 +88,20 @@ class TestPetLambdaFunction(TestCase):
 
     
     def test_get_happy(self):
-        id = str(uuid4())
+        pk_value = str(uuid4())
         data = str(uuid4())
         
         # Populate data for the tests
-        self.mocked_dynamodb_class.table.put_item(Item={"id": id, 
+        self.mocked_dynamodb_class.table.put_item(Item={_DDB_PK: pk_value, 
                                                 "data": data})
 
         # Set the id in the event to be the one we just created
         test_event = self.load_test_event("get_event_sample")
-        test_event['pathParameters']['id'] = id
+        test_event['pathParameters'][_DDB_PK] = pk_value
         
         response = lambda_handler_helper(event=test_event, dynamo_db=self.mocked_dynamodb_class)
         self.assertEqual(response["statusCode"] , 200)
-        self.assertIn(id, response["body"])
+        self.assertIn(pk_value, response["body"])
         self.assertIn(data, response["body"])
         
     def test_get_notFound(self):
@@ -109,18 +111,18 @@ class TestPetLambdaFunction(TestCase):
         self.assertEqual(response["statusCode"] , 404)
         
     def test_create_happy(self):
-        id = str(uuid4())
+        pk_value = str(uuid4())
         
-        # Specify the id of the record we want to create so we can lookup later
+        # Specify the pk_value of the record we want to create so we can lookup later
         test_event = self.load_test_event("create_event_sample")
-        test_event['body'] = "{\"id\":\""+id+"\"}"
+        test_event['body'] = "{\"" +_DDB_PK+"\":\""+pk_value+"\"}"
         
         response = lambda_handler_helper(event=test_event, dynamo_db=self.mocked_dynamodb_class)
         
         self.assertEqual(response["statusCode"] , 200)
         
         # Verify item actually got created in the table
-        item = self.mocked_dynamodb_class.table.get_item(Key={'id': id}).get('Item')
+        item = self.mocked_dynamodb_class.table.get_item(Key={_DDB_PK: pk_value}).get('Item')
         self.assertIsNotNone(item)
         self.assertIsNotNone(item['created'])
         self.assertIsNotNone(item['modified'])
@@ -128,36 +130,36 @@ class TestPetLambdaFunction(TestCase):
         
     def test_create_existing(self):
         # Create a preexisting record
-        id = str(uuid4())
+        pk_value = str(uuid4())
         data = str(uuid4())
-        self.mocked_dynamodb_class.table.put_item(Item={"id": id, 
+        self.mocked_dynamodb_class.table.put_item(Item={_DDB_PK: pk_value, 
                                                 "data": data})
         
         # Set the id in the event to be the one we just created
         test_event = self.load_test_event("create_event_sample")
-        test_event['body'] = "{\"id\":\""+id+"\"}"
+        test_event['body'] = "{\""+_DDB_PK+"\":\""+pk_value+"\"}"
         
         response = lambda_handler_helper(event=test_event, dynamo_db=self.mocked_dynamodb_class)
         self.assertEqual(response["statusCode"] , 400)
         
     def test_delete_happy(self):
-        id = str(uuid4())
+        pk_value = str(uuid4())
         data = str(uuid4())
         
         # Create record so we can test deleting it
-        self.mocked_dynamodb_class.table.put_item(Item={"id": id, 
+        self.mocked_dynamodb_class.table.put_item(Item={_DDB_PK: pk_value, 
                                                 "data": data})
         
         # Specify the id of the record we want to create so we can lookup later
         test_event = self.load_test_event("delete_event_sample")
-        test_event['pathParameters']['id'] = id
+        test_event['pathParameters'][_DDB_PK] = pk_value
         
         response = lambda_handler_helper(event=test_event, dynamo_db=self.mocked_dynamodb_class)
         
         self.assertEqual(response["statusCode"] , 200)
         
         # Verify item actually got deleted in the table
-        self.assertIsNone(self.mocked_dynamodb_class.table.get_item(Key={'id': id}).get('Item'))
+        self.assertIsNone(self.mocked_dynamodb_class.table.get_item(Key={_DDB_PK: pk_value}).get('Item'))
 
     def test_delete_nonExistent(self):
         # Id in event is non existent
@@ -168,47 +170,47 @@ class TestPetLambdaFunction(TestCase):
         self.assertEqual(response["statusCode"] , 200)
         
     def test_update_happy(self):
-        id = str(uuid4())
+        pk_value = str(uuid4())
         data = str(uuid4())
         
         # Create record so we can test updating it
-        self.mocked_dynamodb_class.table.put_item(Item={"id": id, 
+        self.mocked_dynamodb_class.table.put_item(Item={_DDB_PK: pk_value, 
                                                 "data": data})
                                                 
         # Set the id in the event to be the one we just created
         test_event = self.load_test_event("update_event_sample")
-        test_event['body'] = "{\"id\":\""+id+"\"}"
-        test_event['pathParameters']['id'] = id
+        test_event['body'] = "{\""+_DDB_PK+"\":\""+pk_value+"\"}"
+        test_event['pathParameters'][_DDB_PK] = pk_value
         
         response = lambda_handler_helper(event=test_event, dynamo_db=self.mocked_dynamodb_class)
         
         self.assertEqual(response["statusCode"] , 200)
         
         # Verify item actually got updated
-        new_item = self.mocked_dynamodb_class.table.get_item(Key={'id': id}).get('Item')
+        new_item = self.mocked_dynamodb_class.table.get_item(Key={_DDB_PK: pk_value}).get('Item')
         self.assertIsNotNone(new_item)
         self.assertIsNotNone(new_item['modified'])
         
         
     def test_update_id_mismatch(self):
-        id = str(uuid4())
+        pk_value = str(uuid4())
                                                 
         # Set the id in the event to be the one we just created
         test_event = self.load_test_event("update_event_sample")
-        test_event['body'] = "{\"id\":\""+id+"\"}"
-        test_event['pathParameters']['id'] = id + "different"
+        test_event['body'] = "{\""+_DDB_PK+"\":\""+pk_value+"\"}"
+        test_event['pathParameters'][_DDB_PK] = pk_value + "different"
         
         response = lambda_handler_helper(event=test_event, dynamo_db=self.mocked_dynamodb_class)
         
         self.assertEqual(response["statusCode"] , 400)
         
     def test_update_notExist(self):
-        id = str(uuid4())
+        pk_value = str(uuid4())
                                                 
         # Set the id in the event to be the one we just created
         test_event = self.load_test_event("update_event_sample")
-        test_event['body'] = "{\"id\":\""+id+"\"}"
-        test_event['pathParameters']['id'] = id
+        test_event['body'] = "{\""+_DDB_PK+"\":\""+pk_value+"\"}"
+        test_event['pathParameters'][_DDB_PK] = pk_value
         
         response = lambda_handler_helper(event=test_event, dynamo_db=self.mocked_dynamodb_class)
         

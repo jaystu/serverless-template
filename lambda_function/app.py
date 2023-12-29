@@ -55,9 +55,9 @@ def lambda_handler_helper(event: APIGatewayProxyEvent, dynamo_db: LambdaDynamoDB
         return create_item(dynamo_db, item_data)
     elif http_method == 'PUT':
         if path_parameters and _DDB_PK in path_parameters:
-            item_id = path_parameters['id']
+            item_id = path_parameters[_DDB_PK]
             item_data = json.loads(event['body'])
-            if item_id != item_data['id']:
+            if item_id != item_data[_DDB_PK]:
                 return {
                     'statusCode': 400,
                     'body': 'Id in path does not match id in body'
@@ -69,8 +69,8 @@ def lambda_handler_helper(event: APIGatewayProxyEvent, dynamo_db: LambdaDynamoDB
                 'body': 'Invalid PUT request'
             }
     elif http_method == 'DELETE':
-        if path_parameters and 'id' in path_parameters:
-            item_id = path_parameters['id']
+        if path_parameters and _DDB_PK in path_parameters:
+            item_id = path_parameters[_DDB_PK]
             return delete_item(dynamo_db, item_id)
         else:
             return {
@@ -117,7 +117,7 @@ def create_item(dynamo_db: LambdaDynamoDBClass, item_data):
 def get_item(dynamo_db: LambdaDynamoDBClass, item_id):
     try:
         # Get an item from the DynamoDB table
-        response = dynamo_db.table.get_item(Key={'id': item_id})
+        response = dynamo_db.table.get_item(Key={_DDB_PK: item_id})
         item = response.get('Item')
 
         if item:
@@ -154,7 +154,7 @@ def update_item(dynamo_db: LambdaDynamoDBClass, item_id, item_data):
 
         # Update the item only if it already exists
         response = dynamo_db.table.update_item(
-            Key={'id': item_id},
+            Key={_DDB_PK: item_id},
             UpdateExpression=update_expression,
             ExpressionAttributeValues=expression_attribute_values,
             ConditionExpression=condition_expression
@@ -177,7 +177,7 @@ def update_item(dynamo_db: LambdaDynamoDBClass, item_id, item_data):
 def delete_item(dynamo_db: LambdaDynamoDBClass, item_id):
     try:
         # Delete an item from the DynamoDB table
-        response = dynamo_db.table.delete_item(Key={'id': item_id})
+        response = dynamo_db.table.delete_item(Key={_DDB_PK: item_id})
         return {
             'statusCode': 200,
             'body': 'Item deleted successfully'
